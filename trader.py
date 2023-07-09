@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # Manually defined --orderid try to sell
     parser.add_argument('--orderid', type=int, help='Target Order Id (use balance.py)', default=0)
 
-    parser.add_argument('--wait_time', type=float, help='Wait Time (seconds)', default=0.7)
+    parser.add_argument('--wait_time', type=float, help='Wait Time (seconds)', default=1)
     parser.add_argument('--test_mode', type=bool, help='Test Mode True/False', default=False)
     parser.add_argument('--prints', type=bool, help='Scanning Profit Screen Print True/False', default=True)
     parser.add_argument('--debug', help='Debug True/False if set --debug flag, will output all messages every "--wait_time" ',
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     # Working Modes
     #  - profit: Profit Hunter. Find defined profit, buy and sell. (Ex: 1.3% profit)
-    #  - range: Between target two price, buy and sell. (Ex: <= 0.00100 buy - >= 0.00150 sell )
+    #  - range: Between target two price, buy and sell. (Ex: <= 0.00100 buy - >= 0.00150 sell)
     parser.add_argument('--mode', type=str, help='Working Mode', default='profit')
     parser.add_argument('--buyprice', type=float, help='Buy Price (Price is greater than equal <=)', default=0)
     parser.add_argument('--sellprice', type=float, help='Sell Price (Price is less than equal >=)', default=0)

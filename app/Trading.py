@@ -38,7 +38,7 @@ BNB_COMMISION   = 0.0005
 
 class Trading():
 
-    # Define trade vars  
+    # Define trade vars
     order_id = 0
     order_data = None
 
@@ -118,7 +118,7 @@ class Trading():
     def buy(self, symbol, quantity, buyPrice, profitableSellingPrice):
 
         # Do you have an open order?
-        self.check_order()
+        self.check_no_open_order()
 
         try:
 
@@ -128,8 +128,8 @@ class Trading():
             # Database log
             Database.write([orderId, symbol, 0, buyPrice, 'BUY', quantity, self.option.profit])
 
-            #print('Buy order created id:%d, q:%.8f, p:%.8f' % (orderId, quantity, float(buyPrice)))
-            self.logger.info('%s : Buy order created id:%d, q:%.8f, p:%.8f, Take profit aprox :%.8f' % (symbol, orderId, quantity, float(buyPrice), profitableSellingPrice))
+            #print('Buy order created. id:%d, q:%.8f, p:%.8f' % (orderId, quantity, float(buyPrice)))
+            self.logger.info('%s : Buy order created. id:%d, q:%.8f, p:%.8f, Take profit aprox :%.8f' % (symbol, orderId, quantity, float(buyPrice), profitableSellingPrice))
 
             self.order_id = orderId
 
@@ -138,6 +138,7 @@ class Trading():
         except Exception as e:
             #print('bl: %s' % (e))
             self.logger.debug('Buy error: %s' % (e))
+            print('Buy error: %s' % (e))
             time.sleep(self.WAIT_TIME_BUY_SELL)
             return None
 
@@ -294,7 +295,7 @@ class Trading():
         # If profit is available and there is no purchase from the specified price, take it with the market.
 
         # Do you have an open order?
-        self.check_order()
+        self.check_no_open_order()
 
         trading_size = 0
         time.sleep(self.WAIT_TIME_BUY_SELL)
@@ -376,14 +377,13 @@ class Trading():
             print('Calc Error: %s' % (e))
             return
 
-    def check_order(self):
+    def check_no_open_order(self):
         # If there is an open order, exit.
         if self.order_id > 0:
             exit(1)
 
     def action(self, symbol):
         #import ipdb; ipdb.set_trace()
-
 
         # Order amount
         quantity = self.quantity
@@ -404,6 +404,7 @@ class Trading():
         profitableSellingPrice = self.calc(lastBid)
 
         # Check working mode
+        # "range" or "profit"
         if self.option.mode == 'range':
 
             buyPrice = float(self.option.buyprice)
@@ -454,7 +455,7 @@ class Trading():
         '''
         if (lastAsk >= profitableSellingPrice and self.option.mode == 'profit') or \
            (lastPrice <= float(self.option.buyprice) and self.option.mode == 'range'):
-            self.logger.info ("MOde: {0}, Lastsk: {1}, Profit Sell Price {2}, ".format(self.option.mode, lastAsk, profitableSellingPrice))
+            self.logger.info ("Mode: {0}, Lastask: {1}, Profit Sell Price {2}, ".format(self.option.mode, lastAsk, profitableSellingPrice))
 
             if self.order_id == 0:
                 self.buy(symbol, quantity, buyPrice, profitableSellingPrice)
@@ -498,7 +499,6 @@ class Trading():
 
         minQty = float(filters['LOT_SIZE']['minQty'])
         minPrice = float(filters['PRICE_FILTER']['minPrice'])
-        minNotional = float(filters['MIN_NOTIONAL']['minNotional'])
         quantity = float(self.option.quantity)
 
         # stepSize defines the intervals that a quantity/icebergQty can be increased/decreased by.
@@ -520,9 +520,7 @@ class Trading():
 
         # Set static
         # If quantity or amount is zero, minNotional increase 10%
-        quantity = (minNotional / lastBid)
         quantity = quantity + (quantity * 10 / 100)
-        notional = minNotional
 
         if self.amount > 0:
             # Calculate amount to quantity
@@ -533,7 +531,6 @@ class Trading():
             quantity = self.quantity
 
         quantity = self.format_step(quantity, stepSize)
-        notional = lastBid * float(quantity)
 
         # Set Globals
         self.quantity = quantity
@@ -550,12 +547,6 @@ class Trading():
             self.logger.error('Invalid price, minPrice: %.8f (u: %.8f)' % (minPrice, lastPrice))
             valid = False
 
-        # minNotional = minimum order value (price * quantity)
-        if notional < minNotional:
-            #print('Invalid notional, minNotional: %.8f (u: %.8f)' % (minNotional, notional))
-            self.logger.error('Invalid notional, minNotional: %.8f (u: %.8f)' % (minNotional, notional))
-            valid = False
-
         if not valid:
             exit(1)
 
@@ -566,8 +557,7 @@ class Trading():
 
         symbol = self.option.symbol
 
-        print('Auto Trading for Binance.com @yasinkuyu')
-        print('\n')
+        print('Validating...')
 
         # Validate symbol
         self.validate()

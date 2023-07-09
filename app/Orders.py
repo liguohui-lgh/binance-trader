@@ -3,7 +3,7 @@
 import config 
 
 from BinanceAPI import BinanceAPI
-from Messages import Messages
+from Exit import Exit
 
 # Define Custom import vars
 client = BinanceAPI(config.api_key, config.api_secret)
@@ -16,7 +16,7 @@ class Orders():
         order = client.buy_limit(symbol, quantity, buyPrice)
 
         if 'msg' in order:
-            Messages.get(order['msg'])
+            Exit.msg("buy_limit", order['msg'])
 
         # Buy order created.
         return order['orderId']
@@ -24,10 +24,12 @@ class Orders():
     @staticmethod
     def sell_limit(symbol, quantity, sell_price):
 
-        order = client.sell_limit(symbol, quantity, sell_price)  
+        order = client.sell_limit(symbol, quantity, sell_price)
 
         if 'msg' in order:
-            Messages.get(order['msg'])
+            if 'insufficient balance' in order['msg']:
+                Exit.exit(1)
+            Exit.msg("sell_limit", order['msg'])
 
         return order
 
@@ -37,7 +39,7 @@ class Orders():
         order = client.buy_market(symbol, quantity)  
 
         if 'msg' in order:
-            Messages.get(order['msg'])
+            Exit.msg("buy_market", order['msg'])
 
         return order
 
@@ -47,7 +49,7 @@ class Orders():
         order = client.sell_market(symbol, quantity)  
 
         if 'msg' in order:
-            Messages.get(order['msg'])
+            Exit.msg("sell_market", order['msg'])
 
         return order
 
@@ -58,7 +60,7 @@ class Orders():
             
             order = client.cancel(symbol, orderId)
             if 'msg' in order:
-                Messages.get(order['msg'])
+                Exit.msg("cancel_order", order['msg'])
             
             print('Profit loss, called order, %s' % (orderId))
         
@@ -90,7 +92,7 @@ class Orders():
 
             if 'msg' in order:
                 #import ipdb; ipdb.set_trace()
-                Messages.get(order['msg']) # TODO
+                Exit.msg("get_order", order['msg']) # TODO
                 return False
 
             return order
@@ -106,7 +108,7 @@ class Orders():
             order = client.query_order(symbol, orderId)
     
             if 'msg' in order:
-                Messages.get(order['msg'])
+                Exit.msg("get_order_status", order['msg'])
         
             return order['status']
  
