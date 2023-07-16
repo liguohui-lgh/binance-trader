@@ -7,7 +7,7 @@ import argparse
 
 sys.path.insert(0, './app')
 
-from Trading import Trading
+from Trading2 import Trading2
 
 if __name__ == '__main__':
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # Manually defined --orderid try to sell
     parser.add_argument('--orderid', type=int, help='Target Order Id (use balance.py)', default=0)
 
-    parser.add_argument('--wait_time', type=float, help='Wait Time (seconds)', default=1)
+    parser.add_argument('--wait_time', type=float, help='Wait Time (seconds)', default=5)
     parser.add_argument('--test_mode', type=bool, help='Test Mode True/False', default=False)
     parser.add_argument('--prints', type=bool, help='Scanning Profit Screen Print True/False', default=True)
     parser.add_argument('--debug', help='Debug True/False if set --debug flag, will output all messages every "--wait_time" ',
@@ -42,5 +42,5 @@ if __name__ == '__main__':
     option = parser.parse_args()
 
     # Get start
-    t = Trading(option)
+    t = Trading2(option)
     t.run()

@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# @yasinkuyu
 
 # Define Python imports
 import os
@@ -15,7 +14,6 @@ import logging.handlers
 # Define Custom imports
 from Database import Database
 from Orders import Orders
-
 
 formater_str = '%(asctime)s,%(msecs)d %(levelname)s %(name)s: %(message)s'
 formatter = logging.Formatter(formater_str)
@@ -35,12 +33,10 @@ TOKEN_COMMISION = 0.001
 BNB_COMMISION   = 0.0005
 #((eth*0.05)/100)
 
-
-class Trading():
+class Trading2():
 
     # Define trade vars
     order_id = 0
-    order_data = None
 
     buying = False
 
@@ -129,12 +125,12 @@ class Trading():
     def buy(self, symbol, quantity, buyPrice, profitableSellingPrice):
 
         # Do you have an open order?
-        self.check_no_buying()
+        self.check_not_buying()
         self.check_no_open_order()
 
-        self.buying = True
-
         try:
+            self.buying = True
+
             # Create order
             orderId = Orders.buy_limit(symbol, quantity, buyPrice)
 
@@ -163,28 +159,30 @@ class Trading():
         If not successful, the order will be canceled.
         '''
 
-        buy_order = Orders.get_order(symbol, orderId)
+        curt_order = Orders.get_order(symbol, orderId)
 
-        if buy_order['status'] != 'FILLED' or buy_order['side'] != 'BUY':
+        if (curt_order['status'] == 'FILLED' and curt_order['side'] == 'SELL'):
+            # sell order is filled.
+            self.log_info('Sell order (Filled) Id: %d' % orderId)
+            self.log_info('LastPrice : %.8f' % last_price)
+            self.log_info('Profit: %%%s. Buy price: %.8f Sell price: %.8f' \
+                          % (self.option.profit, float(sell_order['price']), sell_price))
+            
+            self.order_id = 0
             return
+
+        if curt_order['status'] != 'FILLED' or curt_order['side'] != 'BUY':
+            return
+
+        # following is : BUY and FILLED
 
         sell_order = Orders.sell_limit(symbol, quantity, sell_price)
 
         sell_id = sell_order['orderId']
         self.log_info('Sell order create id: %d' % sell_id)
 
-        if sell_order['status'] == 'FILLED':
+        self.order_id = sell_id
 
-            self.log_info('Sell order (Filled) Id: %d' % sell_id)
-            self.log_info('LastPrice : %.8f' % last_price)
-            self.log_info('Profit: %%%s. Buy price: %.8f Sell price: %.8f' \
-                          % (self.option.profit, float(sell_order['price']), sell_price))
-
-            self.order_id = 0
-            self.order_data = None
-
-            return
-    
     def calc(self, lastBid):
         try:
 
@@ -201,7 +199,7 @@ class Trading():
         if self.order_id > 0:
             exit(1)
     
-    def check_no_buying(self):
+    def check_not_buying(self):
         if self.buying:
             exit(1)
 
@@ -242,19 +240,11 @@ class Trading():
 
         if self.order_id > 0: # 尝试提交sell
 
-            # Profit mode
-            if self.order_data is not None:
-                # Last control
-                newProfitableSellingPrice = self.calc(float(self.order_data['price']))
-
-                if (lastAsk >= newProfitableSellingPrice):
-                    profitableSellingPrice = newProfitableSellingPrice
-
             # range mode
             if self.option.mode == 'range':
                 profitableSellingPrice = self.option.sellprice
 
-            '''            
+            '''
             If the order is complete, 
             try to sell it.
             '''
@@ -270,6 +260,7 @@ class Trading():
         if ask price is greater than profit price, 
         buy with my buy price,    
         '''
+        # order id is null
         if (lastAsk >= profitableSellingPrice and self.option.mode == 'profit') or \
                 (lastPrice <= float(self.option.buyprice) and self.option.mode == 'range'):
             self.logger.info ("Mode: {0}, Lastask: {1}, Profit Sell Price {2}, ".format(self.option.mode, lastAsk, profitableSellingPrice))
