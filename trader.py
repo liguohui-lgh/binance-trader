@@ -18,8 +18,6 @@ if __name__ == '__main__':
     parser.add_argument('--symbol', type=str, help='Market Symbol (Ex: XVGBTC - XVGETH)', required=True)
     parser.add_argument('--profit', type=float, help='Target Profit', default=1.3)
 
-    parser.add_argument('--stop_loss', type=float, help='Target Stop-Loss %% (If the price drops by 6%%, sell market_price.)', default=0)
-
     parser.add_argument('--increasing', type=float, help='Buy Price +Increasing (0.00000001)', default=0.00000001)
     parser.add_argument('--decreasing', type=float, help='Sell Price -Decreasing (0.00000001)', default=0.00000001)
 

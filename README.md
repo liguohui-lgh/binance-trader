@@ -63,7 +63,6 @@ This is an experimental bot for auto trading the binance.com exchange. [@yasinku
     --amount       Buy/Sell BTC Amount (default 0)
     --symbol       Market Symbol (default XVGBTC or XVGETH)
     --profit       Target Profit Percentage (default 1.3)
-    --stop_loss    Decrease sell price at loss Percentage (default 0)
     --orderid      Target Order Id (default 0)
     --wait_time    Wait Time (seconds) (default 0.7)
     --increasing   Buy Price Increasing  +(default 0.00000001)

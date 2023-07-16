@@ -23,6 +23,9 @@ class Orders():
 
     @staticmethod
     def sell_limit(symbol, quantity, sell_price):
+        """
+        提交限价单
+        """
 
         order = client.sell_limit(symbol, quantity, sell_price)
 
