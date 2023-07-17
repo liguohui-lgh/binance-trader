@@ -45,7 +45,7 @@ This is an experimental bot for auto trading the binance.com exchange. [@yasinku
 
 ## Usage (trading module)
 
-    python trader.py --symbol TUSDUSDT --mode range --quantity 11 --buyprice 0.9993 --sellprice 0.9995
+    python trader.py --symbol TUSDUSDT --mode range --quantity 11 --buyprice 0.9993 --sellprice 0.9994
 
     python trader.py --symbol XVGBTC
 
